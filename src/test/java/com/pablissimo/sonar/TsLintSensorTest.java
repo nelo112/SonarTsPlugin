@@ -34,6 +34,7 @@ import com.pablissimo.sonar.model.TsLintPosition;
 import edu.emory.mathcs.backport.java.util.Arrays;
 
 public class TsLintSensorTest {
+
     Settings settings;
     FileSystem fileSystem;
     ResourcePerspectives perspectives;
@@ -67,7 +68,7 @@ public class TsLintSensorTest {
         this.file = mock(File.class);
         doReturn(true).when(this.file).isFile();
 
-        this.files = new ArrayList<File>(Arrays.asList(new File[] {
+        this.files = new ArrayList<File>(Arrays.asList(new File[]{
             this.file
         }));
 
@@ -127,7 +128,7 @@ public class TsLintSensorTest {
 
         issue.setStartPosition(startPosition);
 
-        TsLintIssue[] issues = new TsLintIssue[] {
+        TsLintIssue[] issues = new TsLintIssue[]{
             issue
         };
 

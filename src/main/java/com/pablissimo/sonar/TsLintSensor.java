@@ -97,14 +97,14 @@ public class TsLintSensor implements Sensor {
             if (issues != null) {
                 for (TsLintIssue issue : issues) {
                     issuable.addIssue
-                    (
-                        issuable
-                            .newIssueBuilder()
-                            .line(issue.getStartPosition().getLine() + 1)
-                            .message(issue.getFailure())
-                            .ruleKey(RuleKey.of(TsRulesDefinition.REPOSITORY_NAME, issue.getRuleName()))
-                            .build()
-                    );
+                        (
+                            issuable
+                                .newIssueBuilder()
+                                .line(issue.getStartPosition().getLine() + 1)
+                                .message(issue.getFailure())
+                                .ruleKey(RuleKey.of(TsRulesDefinition.REPOSITORY_NAME, issue.getRuleName()))
+                                .build()
+                        );
                 }
             }
         }
@@ -135,8 +135,7 @@ public class TsLintSensor implements Sensor {
             if (params == null || params.size() == 0) {
                 // Simple binary rule
                 toReturn.addRule(rule.getRuleKey(), rule.isEnabled());
-            }
-            else {
+            } else {
                 List<Object> processedParams = new ArrayList<Object>(params.size());
                 processedParams.add(true);
 
