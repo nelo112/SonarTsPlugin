@@ -30,6 +30,7 @@ import com.pablissimo.sonar.model.TsLintConfig;
 import com.pablissimo.sonar.model.TsLintIssue;
 
 public class TsLintSensor implements Sensor {
+
     public static final String CONFIG_FILENAME = "tslint.json";
 
     private static final Logger LOG = LoggerFactory.getLogger(TsLintExecutorImpl.class);
@@ -150,7 +151,7 @@ public class TsLintSensor implements Sensor {
                             processedParams.add(Integer.parseInt(param.getValue()));
                             break;
                         default:
-                            processedParams.add(param.getValue());
+                            processedParams.add(param.getKey());
                             break;
                     }
                 }
@@ -161,4 +162,5 @@ public class TsLintSensor implements Sensor {
 
         return toReturn;
     }
+
 }
