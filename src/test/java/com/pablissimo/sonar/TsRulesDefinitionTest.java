@@ -3,17 +3,12 @@ package com.pablissimo.sonar;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.sonar.api.batch.rule.RuleParam;
 import org.sonar.api.rule.Severity;
 import org.sonar.api.server.rule.RuleParamType;
 import org.sonar.api.server.rule.RulesDefinition;
 import org.sonar.api.server.rule.RulesDefinition.Context;
-import org.sonar.api.server.rule.RulesDefinition.NewRepository;
-import org.sonar.api.server.rule.RulesDefinition.NewRule;
 import org.sonar.api.server.rule.RulesDefinition.Rule;
 
 public class TsRulesDefinitionTest {
@@ -419,15 +414,15 @@ public class TsRulesDefinitionTest {
 		assertEquals(RuleParamType.BOOLEAN, parameterParam.type());
 		assertEquals("true", parameterParam.defaultValue());
 
-		RulesDefinition.Param propertySignatureParam = getParam(rule, TsRulesDefinition.RULE_PARAM_PROPERTY_DECLARATOR);
+		RulesDefinition.Param propertySignatureParam = getParam(rule, TsRulesDefinition.RULE_PARAM_PROPERTY_DECLARATION);
 		assertEquals(RuleParamType.BOOLEAN, propertySignatureParam.type());
 		assertEquals("true", propertySignatureParam.defaultValue());
 
-		RulesDefinition.Param variableDeclaratorParam = getParam(rule, TsRulesDefinition.RULE_PARAM_VARIABLE_DECLARATOR);
+		RulesDefinition.Param variableDeclaratorParam = getParam(rule, TsRulesDefinition.RULE_PARAM_VARIABLE_DECLARATION);
 		assertEquals(RuleParamType.BOOLEAN, variableDeclaratorParam.type());
 		assertEquals("true", variableDeclaratorParam.defaultValue());
 
-		RulesDefinition.Param memberVariableDeclaratorParam = getParam(rule, TsRulesDefinition.RULE_PARAM_MEMBER_VARIABLE_DECLARACTOR);
+		RulesDefinition.Param memberVariableDeclaratorParam = getParam(rule, TsRulesDefinition.RULE_PARAM_MEMBER_VARIABLE_DECLARACTION);
 		assertEquals(RuleParamType.BOOLEAN, memberVariableDeclaratorParam.type());
 		assertEquals("true", memberVariableDeclaratorParam.defaultValue());
 	}
@@ -456,13 +451,13 @@ public class TsRulesDefinitionTest {
 		assertTrue(parameterParam.type().values().contains("noSpace"));
 		assertEquals("noSpace", parameterParam.defaultValue());
 
-		RulesDefinition.Param propertyDeclaratorParam = getParam(rule, TsRulesDefinition.RULE_PARAM_PROPERTY_DECLARATOR);
+		RulesDefinition.Param propertyDeclaratorParam = getParam(rule, TsRulesDefinition.RULE_PARAM_PROPERTY_DECLARATION);
 		assertEquals(2, propertyDeclaratorParam.type().values().size());
 		assertTrue(propertyDeclaratorParam.type().values().contains("space"));
 		assertTrue(propertyDeclaratorParam.type().values().contains("noSpace"));
 		assertEquals("noSpace", propertyDeclaratorParam.defaultValue());
 
-		RulesDefinition.Param variableDeclaratorParam = getParam(rule, TsRulesDefinition.RULE_PARAM_VARIABLE_DECLARATOR);
+		RulesDefinition.Param variableDeclaratorParam = getParam(rule, TsRulesDefinition.RULE_PARAM_VARIABLE_DECLARATION);
 		assertEquals(2, variableDeclaratorParam.type().values().size());
 		assertTrue(variableDeclaratorParam.type().values().contains("space"));
 		assertTrue(variableDeclaratorParam.type().values().contains("noSpace"));

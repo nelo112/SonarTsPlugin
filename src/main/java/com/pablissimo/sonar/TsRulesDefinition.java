@@ -76,9 +76,9 @@ public class TsRulesDefinition implements RulesDefinition {
     public static final String RULE_TYPEDEF = "typedef";
     public static final String RULE_PARAM_CALL_SIGNATURE = "call-signature";
     public static final String RULE_PARAM_PARAMETER = "parameter";
-    public static final String RULE_PARAM_PROPERTY_DECLARATOR = "property-declarator";
-    public static final String RULE_PARAM_VARIABLE_DECLARATOR = "variable-declarator";
-    public static final String RULE_PARAM_MEMBER_VARIABLE_DECLARACTOR = "member-variable-declaractor";
+    public static final String RULE_PARAM_PROPERTY_DECLARATION = "property-declaration";
+    public static final String RULE_PARAM_VARIABLE_DECLARATION = "variable-declaration";
+    public static final String RULE_PARAM_MEMBER_VARIABLE_DECLARACTION = "member-variable-declaraction";
     public static final String RULE_TYPEDEF_WHITESPACE = "typedef-whitespace";
     public static final String RULE_PARAM_INDEX_SIGNATURE = "index-signature";
     public static final String RULE_USE_STRICT = "use-strict";
@@ -290,19 +290,19 @@ public class TsRulesDefinition implements RulesDefinition {
                 .setDefaultValue("true");
 
         typeDefRule
-                .createParam(RULE_PARAM_PROPERTY_DECLARATOR)
+                .createParam(RULE_PARAM_PROPERTY_DECLARATION)
                 .setDescription("Require property types be specified")
                 .setType(RuleParamType.BOOLEAN)
                 .setDefaultValue("true");
 
         typeDefRule
-                .createParam(RULE_PARAM_VARIABLE_DECLARATOR)
+                .createParam(RULE_PARAM_VARIABLE_DECLARATION)
                 .setDescription("Require variable types be specified")
                 .setType(RuleParamType.BOOLEAN)
                 .setDefaultValue("true");
 
         typeDefRule
-                .createParam(RULE_PARAM_MEMBER_VARIABLE_DECLARACTOR)
+                .createParam(RULE_PARAM_MEMBER_VARIABLE_DECLARACTION)
                 .setDescription("Require member variable types be specified")
                 .setType(RuleParamType.BOOLEAN)
                 .setDefaultValue("true");
@@ -327,13 +327,13 @@ public class TsRulesDefinition implements RulesDefinition {
                 .setDefaultValue("noSpace");
 
         typeDefWhitespaceRule
-                .createParam(RULE_PARAM_PROPERTY_DECLARATOR)
+                .createParam(RULE_PARAM_PROPERTY_DECLARATION)
                 .setDescription("Configure whitespace before object property declarations")
                 .setType(RuleParamType.singleListOfValues("space", "noSpace"))
                 .setDefaultValue("noSpace");
 
         typeDefWhitespaceRule
-                .createParam(RULE_PARAM_VARIABLE_DECLARATOR)
+                .createParam(RULE_PARAM_VARIABLE_DECLARATION)
                 .setDescription("Configure whitespace before variable declaration")
                 .setType(RuleParamType.singleListOfValues("space", "noSpace"))
                 .setDefaultValue("noSpace");
@@ -350,7 +350,6 @@ public class TsRulesDefinition implements RulesDefinition {
                 .setDescription("Check that top-level functions use strict mode")
                 .setType(RuleParamType.BOOLEAN)
                 .setDefaultValue("true");
-
         NewRule variableNameRule = repository.createRule(RULE_VARIABLE_NAME).setName("Variable names must be either camelCased or UPPER_CASED").setSeverity(Severity.MAJOR);
         variableNameRule
                 .createParam(RULE_PARAM_ALLOW_LEADING_UNDERSCORE)
