@@ -3,20 +3,16 @@ package com.pablissimo.sonar;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.sonar.api.batch.rule.RuleParam;
 import org.sonar.api.rule.Severity;
 import org.sonar.api.server.rule.RuleParamType;
 import org.sonar.api.server.rule.RulesDefinition;
 import org.sonar.api.server.rule.RulesDefinition.Context;
-import org.sonar.api.server.rule.RulesDefinition.NewRepository;
-import org.sonar.api.server.rule.RulesDefinition.NewRule;
 import org.sonar.api.server.rule.RulesDefinition.Rule;
 
 public class TsRulesDefinitionTest {
+
     TsRulesDefinition definition;
     Context context;
 
@@ -32,6 +28,26 @@ public class TsRulesDefinitionTest {
         this.definition.define(context);
 
         verify(context).createRepository(eq(TsRulesDefinition.REPOSITORY_NAME), eq(TypeScriptLanguage.LANGUAGE_EXTENSION));
+    }
+
+    @Test
+    public void ConfiguresAlignRule() {
+        Rule rule = getRule(TsRulesDefinition.RULE_ALIGN);
+        assertEquals(Severity.MINOR, rule.severity());
+
+        assertEquals(3, rule.params().size());
+
+        RulesDefinition.Param parametersParam = getParam(rule, TsRulesDefinition.RULE_PARAM_PARAMETERS);
+        assertEquals(RuleParamType.BOOLEAN, parametersParam.type());
+        assertEquals("true", parametersParam.defaultValue());
+
+        RulesDefinition.Param argumentsParam = getParam(rule, TsRulesDefinition.RULE_PARAM_ARGUMENTS);
+        assertEquals(RuleParamType.BOOLEAN, argumentsParam.type());
+        assertEquals("true", argumentsParam.defaultValue());
+
+        RulesDefinition.Param statementsParam = getParam(rule, TsRulesDefinition.RULE_PARAM_STATEMENTS);
+        assertEquals(RuleParamType.BOOLEAN, statementsParam.type());
+        assertEquals("true", statementsParam.defaultValue());
     }
 
     @Test
@@ -127,6 +143,12 @@ public class TsRulesDefinitionTest {
     }
 
     @Test
+    public void ConfiguresMemberAccessRule() {
+        Rule rule = getRule(TsRulesDefinition.RULE_MEMBER_ACCESS);
+        assertEquals(Severity.MAJOR, rule.severity());
+    }
+
+    @Test
     public void ConfiguresMemberOrderingRule() {
         Rule rule = getRule(TsRulesDefinition.RULE_MEMBER_ORDERING);
         assertEquals(Severity.MAJOR, rule.severity());
@@ -159,6 +181,12 @@ public class TsRulesDefinitionTest {
     @Test
     public void ConfiguresNoBitwiseRule() {
         Rule rule = getRule(TsRulesDefinition.RULE_NO_BITWISE);
+        assertEquals(Severity.MAJOR, rule.severity());
+    }
+
+    @Test
+    public void ConfiguresNoConditionalAssignmentRule() {
+        Rule rule = getRule(TsRulesDefinition.RULE_NO_CONDITIONAL_ASSIGNMENT);
         assertEquals(Severity.MAJOR, rule.severity());
     }
 
@@ -203,6 +231,12 @@ public class TsRulesDefinitionTest {
     }
 
     @Test
+    public void ConfiguresNoSHadowedVariableRule() {
+        Rule rule = getRule(TsRulesDefinition.RULE_NO_SHADOWED_VARIABLE);
+        assertEquals(Severity.MAJOR, rule.severity());
+    }
+
+    @Test
     public void ConfiguresNoDuplicateVariableRule() {
         Rule rule = getRule(TsRulesDefinition.RULE_NO_DUPLICATE_VARIABLE);
         assertEquals(Severity.MAJOR, rule.severity());
@@ -218,6 +252,18 @@ public class TsRulesDefinitionTest {
     public void ConfiguresNoEvalRule() {
         Rule rule = getRule(TsRulesDefinition.RULE_NO_EVAL);
         assertEquals(Severity.CRITICAL, rule.severity());
+    }
+
+    @Test
+    public void ConfiguresNoInternalModuleRule() {
+        Rule rule = getRule(TsRulesDefinition.RULE_NO_INTERNAL_MODULE);
+        assertEquals(Severity.MAJOR, rule.severity());
+    }
+
+    @Test
+    public void ConfiguresNoRequireImportsRule() {
+        Rule rule = getRule(TsRulesDefinition.RULE_NO_REQUIRE_IMPORTS);
+        assertEquals(Severity.MAJOR, rule.severity());
     }
 
     @Test
@@ -267,6 +313,24 @@ public class TsRulesDefinitionTest {
     }
 
     @Test
+    public void ConfiguresNoUseBeforeDeclareRule() {
+        Rule rule = getRule(TsRulesDefinition.RULE_NO_USE_BEFORE_DECLARE);
+        assertEquals(Severity.CRITICAL, rule.severity());
+    }
+
+    @Test
+    public void ConfiguresNoVarKeywordRule() {
+        Rule rule = getRule(TsRulesDefinition.RULE_NO_VAR_KEYWORD);
+        assertEquals(Severity.MAJOR, rule.severity());
+    }
+
+    @Test
+    public void ConfiguresNoVarRequiresRule() {
+        Rule rule = getRule(TsRulesDefinition.RULE_NO_VAR_REQUIRES);
+        assertEquals(Severity.MAJOR, rule.severity());
+    }
+
+    @Test
     public void ConfiguresOneLineRule() {
         Rule rule = getRule(TsRulesDefinition.RULE_ONE_LINE);
         assertEquals(Severity.MINOR, rule.severity());
@@ -293,11 +357,15 @@ public class TsRulesDefinitionTest {
         Rule rule = getRule(TsRulesDefinition.RULE_QUOTEMARK);
         assertEquals(Severity.MAJOR, rule.severity());
 
-        RulesDefinition.Param checkCatchParam = getParam(rule, TsRulesDefinition.RULE_PARAM_QUOTE_MARK);
-        assertEquals(2, checkCatchParam.type().values().size());
-        assertTrue(checkCatchParam.type().values().contains("single"));
-        assertTrue(checkCatchParam.type().values().contains("double"));
-        assertEquals("double", checkCatchParam.defaultValue());
+        RulesDefinition.Param qouteMarkParam = getParam(rule, TsRulesDefinition.RULE_PARAM_QUOTE_MARK);
+        assertEquals(2, qouteMarkParam.type().values().size());
+        assertTrue(qouteMarkParam.type().values().contains("single"));
+        assertTrue(qouteMarkParam.type().values().contains("double"));
+        assertEquals("double", qouteMarkParam.defaultValue());
+
+        RulesDefinition.Param avoidEscapeParam = getParam(rule, TsRulesDefinition.RULE_PARAM_AVOID_ESCAPE);
+        assertEquals(RuleParamType.BOOLEAN, avoidEscapeParam.type());
+        assertEquals("true", avoidEscapeParam.defaultValue());
     }
 
     @Test
@@ -313,6 +381,28 @@ public class TsRulesDefinitionTest {
     }
 
     @Test
+    public void ConfiguresSortObjectLiteralKeysRule() {
+        Rule rule = getRule(TsRulesDefinition.RULE_SORT_OBJECT_LITERAL_KEYS);
+        assertEquals(Severity.MAJOR, rule.severity());
+    }
+
+    @Test
+    public void ConfiguresSwitchDefaultRule() {
+        Rule rule = getRule(TsRulesDefinition.RULE_SWITCH_DEFAULT);
+        assertEquals(Severity.MAJOR, rule.severity());
+    }
+
+    @Test
+    public void ConfiguresTripleEqualsRule() {
+        Rule rule = getRule(TsRulesDefinition.RULE_TRIPLE_EQUALS);
+        assertEquals(Severity.MAJOR, rule.severity());
+
+        RulesDefinition.Param allowNullCheckParam = getParam(rule, TsRulesDefinition.RULE_PARAM_ALLOW_NULL_CHECK);
+        assertEquals(RuleParamType.BOOLEAN, allowNullCheckParam.type());
+        assertEquals("true", allowNullCheckParam.defaultValue());
+    }
+
+    @Test
     public void ConfiguresTypedefRule() {
         Rule rule = getRule(TsRulesDefinition.RULE_TYPEDEF);
         assertEquals(Severity.MAJOR, rule.severity());
@@ -321,23 +411,19 @@ public class TsRulesDefinitionTest {
         assertEquals(RuleParamType.BOOLEAN, callSignatureParam.type());
         assertEquals("true", callSignatureParam.defaultValue());
 
-        RulesDefinition.Param paramIndexSignatureParam = getParam(rule, TsRulesDefinition.RULE_PARAM_INDEX_SIGNATURE);
-        assertEquals(RuleParamType.BOOLEAN, paramIndexSignatureParam.type());
-        assertEquals("true", paramIndexSignatureParam.defaultValue());
-
         RulesDefinition.Param parameterParam = getParam(rule, TsRulesDefinition.RULE_PARAM_PARAMETER);
         assertEquals(RuleParamType.BOOLEAN, parameterParam.type());
         assertEquals("true", parameterParam.defaultValue());
 
-        RulesDefinition.Param propertySignatureParam = getParam(rule, TsRulesDefinition.RULE_PARAM_PROPERTY_SIGNATURE);
+        RulesDefinition.Param propertySignatureParam = getParam(rule, TsRulesDefinition.RULE_PARAM_PROPERTY_DECLARATION);
         assertEquals(RuleParamType.BOOLEAN, propertySignatureParam.type());
         assertEquals("true", propertySignatureParam.defaultValue());
 
-        RulesDefinition.Param variableDeclaratorParam = getParam(rule, TsRulesDefinition.RULE_PARAM_VARIABLE_DECLARATOR);
+        RulesDefinition.Param variableDeclaratorParam = getParam(rule, TsRulesDefinition.RULE_PARAM_VARIABLE_DECLARATION);
         assertEquals(RuleParamType.BOOLEAN, variableDeclaratorParam.type());
         assertEquals("true", variableDeclaratorParam.defaultValue());
 
-        RulesDefinition.Param memberVariableDeclaratorParam = getParam(rule, TsRulesDefinition.RULE_PARAM_MEMBER_VARIABLE_DECLARACTOR);
+        RulesDefinition.Param memberVariableDeclaratorParam = getParam(rule, TsRulesDefinition.RULE_PARAM_MEMBER_VARIABLE_DECLARACTION);
         assertEquals(RuleParamType.BOOLEAN, memberVariableDeclaratorParam.type());
         assertEquals("true", memberVariableDeclaratorParam.defaultValue());
     }
@@ -353,17 +439,30 @@ public class TsRulesDefinitionTest {
         assertTrue(callSignatureParam.type().values().contains("noSpace"));
         assertEquals("noSpace", callSignatureParam.defaultValue());
 
-        RulesDefinition.Param catchClauseParam = getParam(rule, TsRulesDefinition.RULE_PARAM_CATCH_CLAUSE);
-        assertEquals(2, catchClauseParam.type().values().size());
-        assertTrue(catchClauseParam.type().values().contains("space"));
-        assertTrue(catchClauseParam.type().values().contains("noSpace"));
-        assertEquals("noSpace", catchClauseParam.defaultValue());
 
         RulesDefinition.Param indexSignatureParam = getParam(rule, TsRulesDefinition.RULE_PARAM_INDEX_SIGNATURE);
         assertEquals(2, indexSignatureParam.type().values().size());
         assertTrue(indexSignatureParam.type().values().contains("space"));
         assertTrue(indexSignatureParam.type().values().contains("noSpace"));
-        assertEquals("space", indexSignatureParam.defaultValue());
+        assertEquals("noSpace", indexSignatureParam.defaultValue());
+
+        RulesDefinition.Param parameterParam = getParam(rule, TsRulesDefinition.RULE_PARAM_PARAMETER);
+        assertEquals(2, parameterParam.type().values().size());
+        assertTrue(parameterParam.type().values().contains("space"));
+        assertTrue(parameterParam.type().values().contains("noSpace"));
+        assertEquals("noSpace", parameterParam.defaultValue());
+
+        RulesDefinition.Param propertyDeclaratorParam = getParam(rule, TsRulesDefinition.RULE_PARAM_PROPERTY_DECLARATION);
+        assertEquals(2, propertyDeclaratorParam.type().values().size());
+        assertTrue(propertyDeclaratorParam.type().values().contains("space"));
+        assertTrue(propertyDeclaratorParam.type().values().contains("noSpace"));
+        assertEquals("noSpace", propertyDeclaratorParam.defaultValue());
+
+        RulesDefinition.Param variableDeclaratorParam = getParam(rule, TsRulesDefinition.RULE_PARAM_VARIABLE_DECLARATION);
+        assertEquals(2, variableDeclaratorParam.type().values().size());
+        assertTrue(variableDeclaratorParam.type().values().contains("space"));
+        assertTrue(variableDeclaratorParam.type().values().contains("noSpace"));
+        assertEquals("noSpace", variableDeclaratorParam.defaultValue());
     }
 
     @Test
@@ -388,6 +487,10 @@ public class TsRulesDefinitionTest {
         RulesDefinition.Param allowLeadingUnderscoreParam = getParam(rule, TsRulesDefinition.RULE_PARAM_ALLOW_LEADING_UNDERSCORE);
         assertEquals(RuleParamType.BOOLEAN, allowLeadingUnderscoreParam.type());
         assertEquals("true", allowLeadingUnderscoreParam.defaultValue());
+
+        RulesDefinition.Param allowtrailingUnderscoreParam = getParam(rule, TsRulesDefinition.RULE_PARAM_ALLOW_TRAILING_UNDERSCORE);
+        assertEquals(RuleParamType.BOOLEAN, allowtrailingUnderscoreParam.type());
+        assertEquals("true", allowtrailingUnderscoreParam.defaultValue());
     }
 
     @Test
@@ -406,6 +509,10 @@ public class TsRulesDefinitionTest {
         RulesDefinition.Param checkOperatorParam = getParam(rule, TsRulesDefinition.RULE_PARAM_CHECK_OPERATOR);
         assertEquals(RuleParamType.BOOLEAN, checkOperatorParam.type());
         assertEquals("true", checkOperatorParam.defaultValue());
+
+        RulesDefinition.Param checkModuleParam = getParam(rule, TsRulesDefinition.RULE_PARAM_CHECK_MODULE);
+        assertEquals(RuleParamType.BOOLEAN, checkModuleParam.type());
+        assertEquals("true", checkModuleParam.defaultValue());
 
         RulesDefinition.Param checkSeparatorParam = getParam(rule, TsRulesDefinition.RULE_PARAM_CHECK_SEPARATOR);
         assertEquals(RuleParamType.BOOLEAN, checkSeparatorParam.type());
@@ -428,4 +535,5 @@ public class TsRulesDefinitionTest {
     private RulesDefinition.Param getParam(Rule rule, String name) {
         return rule.param(name);
     }
+
 }
