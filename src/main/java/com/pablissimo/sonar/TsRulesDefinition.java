@@ -6,7 +6,6 @@ import org.sonar.api.server.rule.RuleParamType;
 import org.sonar.api.server.rule.RulesDefinition;
 
 public class TsRulesDefinition implements RulesDefinition {
-
     public static final String RULE_ALIGN = "align";
     public static final String RULE_PARAM_PARAMETERS = "parameters";
     public static final String RULE_PARAM_ARGUMENTS = "arguments";
@@ -82,6 +81,7 @@ public class TsRulesDefinition implements RulesDefinition {
     public static final String RULE_PARAM_MEMBER_VARIABLE_DECLARACTION = "member-variable-declaraction";
     public static final String RULE_TYPEDEF_WHITESPACE = "typedef-whitespace";
     public static final String RULE_PARAM_INDEX_SIGNATURE = "index-signature";
+    public static final String RULE_PARAM_UNKNOWN_RULE = "unknown-rule";
     public static final String RULE_USE_STRICT = "use-strict";
     public static final String RULE_PARAM_CHECK_MODULE = "check-module";
     public static final String RULE_PARAM_CHECK_FUNCTION = "check-function";
@@ -95,8 +95,6 @@ public class TsRulesDefinition implements RulesDefinition {
     public static final String RULE_PARAM_CHECK_SEPARATOR = "check-separator";
     public static final String RULE_PARAM_CHECK_TYPE = "check-type";
     public static final String RULE_PARAM_CHECK_TYPECAST = "check-typecast";
-
-
     public static final String REPOSITORY_NAME = "tslint";
 
     public void define(Context context) {
@@ -105,26 +103,16 @@ public class TsRulesDefinition implements RulesDefinition {
                 .createRepository(REPOSITORY_NAME, TypeScriptLanguage.LANGUAGE_EXTENSION)
                 .setName("TsLint Analyser");
 
-
         NewRule alignRule = repository.createRule(RULE_ALIGN).setName("Enforces vertical Alignment").setSeverity(Severity.MINOR);
         alignRule
             .createParam(RULE_PARAM_PARAMETERS)
-            .setDescription("Checks alignment of function parameters")
-            .setType(RuleParamType.BOOLEAN)
-            .setDefaultValue("true");
-
+            .setDescription("Checks alignment of function parameters");
         alignRule
             .createParam(RULE_PARAM_ARGUMENTS)
-            .setDescription("Checks alignment of function call arguments")
-            .setType(RuleParamType.BOOLEAN)
-            .setDefaultValue("true");
-
+            .setDescription("Checks alignment of function call arguments");
         alignRule
             .createParam(RULE_PARAM_STATEMENTS)
-            .setDescription("Checks alignment of statements")
-            .setType(RuleParamType.BOOLEAN)
-            .setDefaultValue("true");
-
+            .setDescription("Checks alignment of statements");
 
         repository.createRule(RULE_BAN).setName("Use of this method is banned by current configuration").setSeverity(Severity.CRITICAL);
         repository.createRule(RULE_CLASS_NAME).setName("Name must use PascalCase").setSeverity(Severity.MAJOR);
@@ -132,15 +120,10 @@ public class TsRulesDefinition implements RulesDefinition {
         NewRule commentFormatRule = repository.createRule(RULE_COMMENT_FORMAT).setName("Comments must be correctly formatted").setSeverity(Severity.MINOR);
         commentFormatRule
             .createParam(RULE_PARAM_CHECK_SPACE)
-            .setDescription("enforces the rule that all single-line comments must begin with a space, as in // comment")
-            .setType(RuleParamType.BOOLEAN)
-            .setDefaultValue("true");
-
+            .setDescription("enforces the rule that all single-line comments must begin with a space, as in // comment");
         commentFormatRule
             .createParam(RULE_PARAM_CHECK_LOWERCASE)
-            .setDescription("enforces the rule that the first non-whitespace character of a comment must be lowercase, if applicable")
-            .setType(RuleParamType.BOOLEAN)
-            .setDefaultValue("false");
+            .setDescription("enforces the rule that the first non-whitespace character of a comment must be lowercase, if applicable");
 
         repository.createRule(RULE_CURLY).setName("enforces braces for if/for/do/while statements").setSeverity(Severity.MAJOR);
         repository.createRule(RULE_EOFLINE).setName("enforces the file to end with a newline").setSeverity(Severity.MINOR);
@@ -149,9 +132,7 @@ public class TsRulesDefinition implements RulesDefinition {
         NewRule indentRule = repository.createRule(RULE_INDENT).setName("enforces consistent indentation with tabs or spaces").setSeverity(Severity.MINOR);
         indentRule
             .createParam(RULE_PARAM_TABS_OR_SPACES)
-            .setDescription("Specifies if tabs or spaces should be used for indentation")
-            .setType(RuleParamType.singleListOfValues("spaces", "tabs"))
-            .setDefaultValue("tabs");
+            .setDescription("Specifies if tabs or spaces should be used for indentation");
 
         repository.createRule(RULE_INTERFACE_NAME).setName("enforces the rule that interface names must begin with a capital I").setSeverity(Severity.MAJOR);
         repository.createRule(RULE_JSDOC_FORMAT).setName("enforces basic format rules for jsdoc comments - comments starting with /**").setSeverity(Severity.MAJOR);
@@ -161,30 +142,20 @@ public class TsRulesDefinition implements RulesDefinition {
         NewRule maxLineLengthRule = repository.createRule(RULE_MAX_LINE_LENGTH).setName("sets the maximum length of a line").setSeverity(Severity.MAJOR);
         maxLineLengthRule
             .createParam(RULE_PARAM_MAX_LINE_LENGTH)
-            .setDescription("Maximum allowed line length in characters")
-            .setType(RuleParamType.INTEGER)
-            .setDefaultValue("120");
+            .setDescription("Maximum allowed line length in characters");
 
         repository.createRule(RULE_MEMBER_ACCESS).setName("Enforces using explicit visibility on class members").setSeverity(Severity.MAJOR);
 
         NewRule memberOrderingRule = repository.createRule(RULE_MEMBER_ORDERING).setName("enforces ordering of class members").setSeverity(Severity.MAJOR);
         memberOrderingRule
             .createParam(RULE_PARAM_PUBLIC_BEFORE_PRIVATE)
-            .setDescription("Require public members be defined before private members")
-            .setType(RuleParamType.BOOLEAN)
-            .setDefaultValue("true");
-
+            .setDescription("Require public members be defined before private members");
         memberOrderingRule
             .createParam(RULE_PARAM_STATIC_BEFORE_INSTANCE)
-            .setDescription("Require static members be defined before instance members")
-            .setType(RuleParamType.BOOLEAN)
-            .setDefaultValue("true");
-
+            .setDescription("Require static members be defined before instance members");
         memberOrderingRule
             .createParam(RULE_PARAM_VARIABLES_BEFORE_FUNCTIONS)
-            .setDescription("Require member variables to be defined before member functions")
-            .setType(RuleParamType.BOOLEAN)
-            .setDefaultValue("true");
+            .setDescription("Require member variables to be defined before member functions");
 
         repository.createRule(RULE_NO_ANY).setName("'any' must not be used as a type decoration").setSeverity(Severity.MAJOR);
         repository.createRule(RULE_NO_ARG).setName("arguments.callee must not be used").setSeverity(Severity.MAJOR);
@@ -194,9 +165,7 @@ public class TsRulesDefinition implements RulesDefinition {
         NewRule noConsoleRule = repository.createRule(RULE_NO_CONSOLE).setName("Specified function must not be called on the global console object").setSeverity(Severity.MAJOR);
         noConsoleRule
             .createParam(RULE_PARAM_BANNED_CONSOLE_FUNCTIONS)
-            .setDescription("Comma-separated list of functions that should not be called on the console object")
-            .setType(RuleParamType.STRING)
-            .setDefaultValue(null);
+            .setDescription("Comma-separated list of functions that should not be called on the console object");
 
         repository.createRule(RULE_NO_CONSECUTIVE_BLANK_LINES).setName("No more than one blank line should appear in a row").setSeverity(Severity.MINOR);
         repository.createRule(RULE_NO_CONSTRUCT).setName("Constructors of String, Number and Boolean must not be used").setSeverity(Severity.MAJOR);
@@ -219,9 +188,7 @@ public class TsRulesDefinition implements RulesDefinition {
         NewRule noUnusedVariablesRule = repository.createRule(RULE_NO_UNUSED_VARIABLE).setName("Unused imports, variables, functions and private class members are not allowed").setSeverity(Severity.MAJOR);
         noUnusedVariablesRule
             .createParam(RULE_PARAM_CHECK_PARAMETERS)
-            .setDescription("EXPERIMENTAL: Disallow unused function and constructor parameters")
-            .setType(RuleParamType.BOOLEAN)
-            .setDefaultValue("false");
+            .setDescription("EXPERIMENTAL: Disallow unused function and constructor parameters");
 
         repository.createRule(RULE_NO_USE_BEFORE_DECLARE).setName("Variable use before declaration is not allowed").setSeverity(Severity.CRITICAL);
         repository.createRule(RULE_NO_VAR_KEYWORD).setName("Disallows usage of the var keyword, use let or const instead").setSeverity(Severity.MAJOR);
@@ -230,40 +197,24 @@ public class TsRulesDefinition implements RulesDefinition {
         NewRule oneLineRule = repository.createRule(RULE_ONE_LINE).setName("No newline is allowed before keyword").setSeverity(Severity.MINOR);
         oneLineRule
             .createParam(RULE_PARAM_CHECK_CATCH)
-            .setDescription("Require catch statement on same line as try block closing brace")
-            .setType(RuleParamType.BOOLEAN)
-            .setDefaultValue("true");
-
+            .setDescription("Require catch statement on same line as try block closing brace");
         oneLineRule
             .createParam(RULE_PARAM_CHECK_ELSE)
-            .setDescription("Require else statement on same line as if statement closing brace")
-            .setType(RuleParamType.BOOLEAN)
-            .setDefaultValue("true");
-
+            .setDescription("Require else statement on same line as if statement closing brace");
         oneLineRule
             .createParam(RULE_PARAM_CHECK_OPEN_BRACE)
-            .setDescription("Require opening braces appear on the same line as preceding expression")
-            .setType(RuleParamType.BOOLEAN)
-            .setDefaultValue("true");
-
+            .setDescription("Require opening braces appear on the same line as preceding expression");
         oneLineRule
             .createParam(RULE_PARAM_CHECK_WHITESPACE)
-            .setDescription("Require whitespace between try/if block closing brace and catch/else keyword, and if condition and opening brace")
-            .setType(RuleParamType.BOOLEAN)
-            .setDefaultValue("true");
+            .setDescription("Require whitespace between try/if block closing brace and catch/else keyword, and if condition and opening brace");
 
         NewRule quoteMarkRule = repository.createRule(RULE_QUOTEMARK).setName("Consistent use of single or double quotes is required - a mixture is not allowed").setSeverity(Severity.MAJOR);
         quoteMarkRule
             .createParam(RULE_PARAM_QUOTE_MARK)
-            .setDescription("Quotation mark that must be used")
-            .setType(RuleParamType.singleListOfValues("single", "double"))
-            .setDefaultValue("double");
-
+            .setDescription("Quotation mark that must be used");
         quoteMarkRule
             .createParam(RULE_PARAM_AVOID_ESCAPE)
-            .setDescription("Allows you to use the \"other\" quotemark in cases where escaping would normally be required. For example, [true, \"double\", \"avoid-escape\"] would not report a failure on the string literal 'Hello \"World\"'.")
-            .setType(RuleParamType.BOOLEAN)
-            .setDefaultValue("true");
+            .setDescription("Allows you to use the \"other\" quotemark in cases where escaping would normally be required. For example, [true, \"double\", \"avoid-escape\"] would not report a failure on the string literal 'Hello \"World\"'.");
 
         repository.createRule(RULE_RADIX).setName("A radix must be specified when calling parseInt").setSeverity(Severity.CRITICAL);
         repository.createRule(RULE_SEMICOLON).setName("Statement must end with a semicolon").setSeverity(Severity.MAJOR);
@@ -273,146 +224,87 @@ public class TsRulesDefinition implements RulesDefinition {
         NewRule tripleEqualsRule = repository.createRule(RULE_TRIPLE_EQUALS).setName("== and != must not be used - use === or !== instead").setSeverity(Severity.MAJOR);
         tripleEqualsRule
             .createParam(RULE_PARAM_ALLOW_NULL_CHECK)
-            .setDescription("Allow double-equals in null checks")
-            .setType(RuleParamType.BOOLEAN)
-            .setDefaultValue("true");
+            .setDescription("Allow double-equals in null checks");
 
         NewRule typeDefRule = repository.createRule(RULE_TYPEDEF).setName("Type definition must be specified").setSeverity(Severity.MAJOR);
         typeDefRule
             .createParam(RULE_PARAM_CALL_SIGNATURE)
-            .setDescription("Require function return types be specified")
-            .setType(RuleParamType.BOOLEAN)
-            .setDefaultValue("true");
-
+            .setDescription("Require function return types be specified");
         typeDefRule
             .createParam(RULE_PARAM_PARAMETER)
-            .setDescription("Require parameter types to be specified")
-            .setType(RuleParamType.BOOLEAN)
-            .setDefaultValue("true");
-
+            .setDescription("Require parameter types to be specified");
         typeDefRule
             .createParam(RULE_PARAM_PROPERTY_DECLARATION)
-            .setDescription("Require property types be specified")
-            .setType(RuleParamType.BOOLEAN)
-            .setDefaultValue("true");
-
+            .setDescription("Require property types be specified");
         typeDefRule
             .createParam(RULE_PARAM_VARIABLE_DECLARATION)
-            .setDescription("Require variable types be specified")
-            .setType(RuleParamType.BOOLEAN)
-            .setDefaultValue("true");
-
+            .setDescription("Require variable types be specified");
         typeDefRule
             .createParam(RULE_PARAM_MEMBER_VARIABLE_DECLARACTION)
-            .setDescription("Require member variable types be specified")
-            .setType(RuleParamType.BOOLEAN)
-            .setDefaultValue("true");
+            .setDescription("Require member variable types be specified");
 
         NewRule typeDefWhitespaceRule = repository.createRule(RULE_TYPEDEF_WHITESPACE).setName("Whitespace around type definitions must be correct").setSeverity(Severity.MINOR);
         typeDefWhitespaceRule
             .createParam(RULE_PARAM_CALL_SIGNATURE)
-            .setDescription("Configure whitespace before function parameter list and return type specification")
-            .setType(RuleParamType.singleListOfValues("space", "noSpace"))
-            .setDefaultValue("noSpace");
-
+            .setDescription("Configure whitespace before function parameter list and return type specification");
         typeDefWhitespaceRule
             .createParam(RULE_PARAM_INDEX_SIGNATURE)
-            .setDescription("Configure whitespace before index-type specifier of indexers")
-            .setType(RuleParamType.singleListOfValues("space", "noSpace"))
-            .setDefaultValue("noSpace");
-
+            .setDescription("Configure whitespace before index-type specifier of indexers");
         typeDefWhitespaceRule
             .createParam(RULE_PARAM_PARAMETER)
-            .setDescription("Configure whitespace before function parameters")
-            .setType(RuleParamType.singleListOfValues("space", "noSpace"))
-            .setDefaultValue("noSpace");
-
+            .setDescription("Configure whitespace before function parameters");
         typeDefWhitespaceRule
             .createParam(RULE_PARAM_PROPERTY_DECLARATION)
-            .setDescription("Configure whitespace before object property declarations")
-            .setType(RuleParamType.singleListOfValues("space", "noSpace"))
-            .setDefaultValue("noSpace");
-
+            .setDescription("Configure whitespace before object property declarations");
         typeDefWhitespaceRule
             .createParam(RULE_PARAM_VARIABLE_DECLARATION)
-            .setDescription("Configure whitespace before variable declaration")
-            .setType(RuleParamType.singleListOfValues("space", "noSpace"))
-            .setDefaultValue("noSpace");
+            .setDescription("Configure whitespace before variable declaration");
+
+        repository.createRule(RULE_PARAM_UNKNOWN_RULE).setName("This violation is not yet implemented in the TsSonarPlugin").setSeverity(Severity.INFO);
 
         NewRule useStrictRule = repository.createRule(RULE_USE_STRICT).setName("Strict mode must be used").setSeverity(Severity.CRITICAL);
         useStrictRule
             .createParam(RULE_PARAM_CHECK_MODULE)
-            .setDescription("Check that top-level modules use strict mode")
-            .setType(RuleParamType.BOOLEAN)
-            .setDefaultValue("true");
-
+            .setDescription("Check that top-level modules use strict mode");
         useStrictRule
             .createParam(RULE_PARAM_CHECK_FUNCTION)
-            .setDescription("Check that top-level functions use strict mode")
-            .setType(RuleParamType.BOOLEAN)
-            .setDefaultValue("true");
+            .setDescription("Check that top-level functions use strict mode");
+
         NewRule variableNameRule = repository.createRule(RULE_VARIABLE_NAME).setName("Variable names must be either camelCased or UPPER_CASED").setSeverity(Severity.MAJOR);
         variableNameRule
             .createParam(RULE_PARAM_ALLOW_LEADING_UNDERSCORE)
-            .setDescription("Allow variable names to begin with an underscore")
-            .setType(RuleParamType.BOOLEAN)
-            .setDefaultValue("true");
-
+            .setDescription("Allow variable names to begin with an underscore");
         variableNameRule
             .createParam(RULE_PARAM_ALLOW_TRAILING_UNDERSCORE)
-            .setDescription("Allow variable names to end with an underscore")
-            .setType(RuleParamType.BOOLEAN)
-            .setDefaultValue("true");
+            .setDescription("Allow variable names to end with an underscore");
 
         NewRule whitespaceRule = repository.createRule(RULE_WHITESPACE).setName("Inappropriate whitespace between tokens").setSeverity(Severity.MINOR);
         whitespaceRule
             .createParam(RULE_PARAM_CHECK_BRANCH)
-            .setDescription("Branch and loop statements (if/else/for/while) must be followed by whitespace")
-            .setType(RuleParamType.BOOLEAN)
-            .setDefaultValue("true");
-
+            .setDescription("Branch and loop statements (if/else/for/while) must be followed by whitespace");
         whitespaceRule
             .createParam(RULE_PARAM_CHECK_DECL)
-            .setDescription("Variable declarations must have whitespace around the equals sign")
-            .setType(RuleParamType.BOOLEAN)
-            .setDefaultValue("true");
-
+            .setDescription("Variable declarations must have whitespace around the equals sign");
         whitespaceRule
             .createParam(RULE_PARAM_CHECK_OPERATOR)
-            .setDescription("Whitespace is required around operators")
-            .setType(RuleParamType.BOOLEAN)
-            .setDefaultValue("true");
-
+            .setDescription("Whitespace is required around operators");
         whitespaceRule
             .createParam(RULE_PARAM_CHECK_MODULE)
-            .setDescription("Whitespace is required in import & export statements")
-            .setType(RuleParamType.BOOLEAN)
-            .setDefaultValue("true");
-
+            .setDescription("Whitespace is required in import & export statements");
         whitespaceRule
             .createParam(RULE_PARAM_CHECK_SEPARATOR)
-            .setDescription("Whitespace is required after separator tokens (comma and semicolon)")
-            .setType(RuleParamType.BOOLEAN)
-            .setDefaultValue("true");
-
+            .setDescription("Whitespace is required after separator tokens (comma and semicolon)");
         whitespaceRule
             .createParam(RULE_PARAM_CHECK_TYPE)
-            .setDescription("Whitespace is required before a type specification")
-            .setType(RuleParamType.BOOLEAN)
-            .setDefaultValue("true");
-
+            .setDescription("Whitespace is required before a type specification");
         whitespaceRule
             .createParam(RULE_PARAM_CHECK_TYPECAST)
-            .setDescription("Whitespace is required between a typecast and its target")
-            .setType(RuleParamType.BOOLEAN)
-            .setDefaultValue("true");
+            .setDescription("Whitespace is required between a typecast and its target");
 
         for (NewRule rule : repository.rules()) {
             rule.setHtmlDescription("HTML description to follow");
             rule.setStatus(RuleStatus.READY);
         }
-
         repository.done();
     }
-
 }

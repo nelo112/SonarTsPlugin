@@ -18,6 +18,14 @@ import org.sonar.api.SonarPlugin;
         global = true
     ),
     @Property(
+        key = TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH,
+        defaultValue = "",
+        name = "TSLint Config file",
+        description = "Path to TSLint Config File",
+        project = true,
+        global = false
+    ),
+    @Property(
         key = TypeScriptPlugin.SETTING_EXCLUDE_TYPE_DEFINITION_FILES,
         type = PropertyType.BOOLEAN,
         defaultValue = "true",
@@ -48,6 +56,7 @@ public class TypeScriptPlugin extends SonarPlugin {
     public static final String SETTING_EXCLUDE_TYPE_DEFINITION_FILES = "sonar.ts.excludetypedefinitionfiles";
     public static final String SETTING_FORCE_ZERO_COVERAGE = "sonar.ts.forceZeroCoverage";
     public static final String SETTING_TS_LINT_PATH = "sonar.ts.tslintpath";
+    public static final String SETTING_TS_LINT_CONFIG_PATH = "sonar.ts.tslintconfigpath";
     public static final String SETTING_LCOV_REPORT_PATH = "sonar.ts.lcov.reportpath";
 
     public List getExtensions() {

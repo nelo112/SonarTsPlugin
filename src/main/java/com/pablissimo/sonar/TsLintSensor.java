@@ -34,8 +34,6 @@ import com.pablissimo.sonar.model.TsLintIssue;
 
 public class TsLintSensor implements Sensor {
 
-  	public static final String CONFIG_FILENAME = "tslint.json";
-
 	private static final Logger LOG = LoggerFactory.getLogger(TsLintExecutorImpl.class);
 
 	private Settings settings;
@@ -66,25 +64,19 @@ public class TsLintSensor implements Sensor {
 
 		String pathToTsLint = settings.getString(TypeScriptPlugin.SETTING_TS_LINT_PATH);
 		if (pathToTsLint == null) {
-			LOG.warn("Path to tslint (" + TypeScriptPlugin.SETTING_TS_LINT_PATH + ") is not defined. Skipping tslint analysis.");
-			return;
-		}
+            LOG.warn("Path to tslint (" + TypeScriptPlugin.SETTING_TS_LINT_PATH + ") is not defined. Skipping tslint analysis.");
+            return;
+        }
+        String pathToTsLintConfig = settings.getString(TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH);
+        if (pathToTsLintConfig == null) {
+            LOG.warn("Path to tslint config(" + TypeScriptPlugin.SETTING_TS_LINT_PATH + ") is not defined. Skipping tslint analysis.");
+            return;
+        }
 
 		TsLintExecutor executor = this.getTsLintExecutor();
 		TsLintParser parser = this.getTsLintParser();
 
-		// Build the config file
-		File configFile = new File(this.fileSystem.workDir(), CONFIG_FILENAME);
-		TsLintConfig config = getConfiguration();
-		String configSerialised = new GsonBuilder().setPrettyPrinting().create().toJson(config);
-
-		try {
-			writeConfiguration(configSerialised, configFile, Charsets.UTF_8);
-	    } catch (IOException e) {
-	    	throw Throwables.propagate(e);
-	    }
-
-		boolean skipTypeDefFiles = settings.getBoolean(TypeScriptPlugin.SETTING_EXCLUDE_TYPE_DEFINITION_FILES);
+        boolean skipTypeDefFiles = settings.getBoolean(TypeScriptPlugin.SETTING_EXCLUDE_TYPE_DEFINITION_FILES);
 
 		for (File file : fileSystem.files(this.filePredicates.hasLanguage(TypeScriptLanguage.LANGUAGE_EXTENSION))) {
 			if (skipTypeDefFiles && file.getName().toLowerCase().endsWith("." + TypeScriptLanguage.LANGUAGE_DEFINITION_EXTENSION)) {
@@ -94,25 +86,38 @@ public class TsLintSensor implements Sensor {
 			Resource resource = this.getFileFromIOFile(file, project);
 			Issuable issuable = perspectives.as(Issuable.class, resource);
 
-			String jsonResult = executor.execute(pathToTsLint, configFile.getPath(), file.getAbsolutePath());
+            String jsonResult = executor.execute(pathToTsLint, pathToTsLintConfig, file.getAbsolutePath());
 
 			TsLintIssue[] issues = parser.parse(jsonResult);
 
-			if (issues != null) {
-				for (TsLintIssue issue : issues) {
-					issuable.addIssue
-					(
-						issuable
-							.newIssueBuilder()
-							.line(issue.getStartPosition().getLine() + 1)
-							.message(issue.getFailure())
-							.ruleKey(RuleKey.of(TsRulesDefinition.REPOSITORY_NAME, issue.getRuleName()))
-							.build()
-					);
-				}
-			}
-		}
-	}
+            if (issues != null) {
+                for (TsLintIssue issue : issues) {
+                    try {
+                        issuable.addIssue
+                            (
+                                issuable
+                                    .newIssueBuilder()
+                                    .line(issue.getStartPosition().getLine() + 1)
+                                    .message(issue.getFailure())
+                                    .ruleKey(RuleKey.of(TsRulesDefinition.REPOSITORY_NAME, issue.getRuleName()))
+                                    .build()
+                            );
+                    } catch (Exception e) {
+                        issuable.addIssue
+                            (
+                                issuable
+                                    .newIssueBuilder()
+                                    .line(issue.getStartPosition().getLine() + 1)
+                                    .message(issue.getFailure())
+                                    .ruleKey(RuleKey.of(TsRulesDefinition.REPOSITORY_NAME, TsRulesDefinition.RULE_PARAM_UNKNOWN_RULE))
+                                    .build()
+                            );
+                    }
+
+                }
+            }
+        }
+    }
 
 	protected org.sonar.api.resources.File getFileFromIOFile(File file, Project project) {
 		return org.sonar.api.resources.File.fromIOFile(file, project);
@@ -128,52 +133,6 @@ public class TsLintSensor implements Sensor {
 
 	protected TsLintParser getTsLintParser() {
 		return new TsLintParserImpl();
-	}
-
-	protected TsLintConfig getConfiguration() {
-		TsLintConfig toReturn = new TsLintConfig();
-
-		for (ActiveRule rule : this.rulesProfile.getActiveRulesByRepository(TsRulesDefinition.REPOSITORY_NAME)) {
-			List<ActiveRuleParam> params = rule.getActiveRuleParams();
-
-			if (params == null || params.size() == 0) {
-				// Simple binary rule
-				toReturn.addRule(rule.getRuleKey(), rule.isEnabled());
-			}
-			else {
-				List<Object> processedParams = new ArrayList<Object>(params.size());
-				processedParams.add(true);
-
-				// the typedef-whitespace rule has different syntax from the other rules and gets therefore special treatment
-				Map<String, String> typedefWhitespace = new HashMap<>();
-				boolean isTypedefWhitespace = rule.getRuleKey().equals("typedef-whitespace");
-
-				for (ActiveRuleParam param : params) {
-					if (isTypedefWhitespace) {
-						typedefWhitespace.put(param.getKey(), param.getValue());
-					}
-					//check if it is a true boolean
-					else if (param.getValue().toLowerCase().equals("true")) {
-						processedParams.add(param.getKey());
-					}
-					// check if parameter is integer
-					else if (NumberUtils.isNumber(param.getValue())){
-						processedParams.add(Integer.valueOf(param.getValue()));
-					}
-					// check if parameter is a valid string
-					else if (param.getValue() != null && !param.getValue().toLowerCase().equals("false")) {
-						processedParams.add(param.getValue());
-					}
-				}
-				if (isTypedefWhitespace) {
-					processedParams.add(typedefWhitespace);
-				}
-				toReturn.addRule(rule.getRuleKey(), processedParams.toArray());
-			}
-		}
-
-		return toReturn;
-
 	}
 
 }

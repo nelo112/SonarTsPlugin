@@ -53,7 +53,7 @@ public class TypeScriptPluginTest {
         Annotation annotation = plugin.getClass().getAnnotations()[0];
         Properties propertiesAnnotation = (Properties) annotation;
 
-        assertEquals(4, propertiesAnnotation.value().length);
+        assertEquals(5, propertiesAnnotation.value().length);
 
         Property[] properties = propertiesAnnotation.value();
         assertNotNull(findPropertyByName(properties, TypeScriptPlugin.SETTING_EXCLUDE_TYPE_DEFINITION_FILES));

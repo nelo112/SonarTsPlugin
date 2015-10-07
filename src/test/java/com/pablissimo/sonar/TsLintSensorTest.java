@@ -107,17 +107,6 @@ public class TsLintSensorTest {
     }
 
     @Test
-    public void analyse_WritesConfigurationFile() throws IOException {
-        when(this.fileSystem.files(any(FilePredicate.class))).thenReturn(new ArrayList<File>());
-        this.sensor.analyse(mock(Project.class), mock(SensorContext.class));
-
-        ArgumentCaptor<File> fileCaptor = ArgumentCaptor.forClass(File.class);
-        verify(this.sensor).writeConfiguration(eq("{\n  \"rules\": {}\n}"), fileCaptor.capture(), eq(Charsets.UTF_8));
-
-        assertEquals("tslint.json", fileCaptor.getValue().getName());
-    }
-
-    @Test
     public void analyse_addsIssues() {
         TsLintIssue issue = new TsLintIssue();
         issue.setFailure("failure");
