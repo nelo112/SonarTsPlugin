@@ -2,6 +2,7 @@ package com.pablissimo.sonar;
 
 import com.google.common.io.Files;
 import com.pablissimo.sonar.model.TsLintIssue;
+import com.pablissimo.sonar.rules.TsLintRule;
 import com.pablissimo.sonar.rules.TsRulesDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,8 +89,15 @@ public class TsLintSensor implements Sensor {
 
             if (issues != null) {
                 for (TsLintIssue issue : issues) {
-                    String tslintRuleName = issue.getRuleName();
-                    if (!activeRuleKeys.contains(tslintRuleName)) {
+                    String tslintRuleKey = issue.getRuleName();
+
+                    if (!TsLintRule.allKeys().contains(tslintRuleKey)) {
+                        // Rule is not part of the rule repository. Probably a version mismatch between this plugin and
+                        // tslint. Map it to the default rule
+                        tslintRuleKey = TsLintRule.UNKNOWN_RULE.getKey();
+                    }
+
+                    if (!activeRuleKeys.contains(tslintRuleKey)) {
                         continue;
                     }
 
@@ -97,7 +105,7 @@ public class TsLintSensor implements Sensor {
                         .newIssueBuilder()
                         .line(issue.getStartPosition().getLine() + 1)
                         .message(issue.getFailure())
-                        .ruleKey(RuleKey.of(TsRulesDefinition.REPOSITORY_NAME, issue.getRuleName()))
+                        .ruleKey(RuleKey.of(TsRulesDefinition.REPOSITORY_NAME, tslintRuleKey))
                         .build();
 
                     issuable.addIssue(convertedIssue);

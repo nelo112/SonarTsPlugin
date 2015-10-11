@@ -66,7 +66,7 @@ public class TsLintSensorTest {
 
         List<ActiveRule> activeRules = new ArrayList<>();
         ActiveRule activeRule = mock(ActiveRule.class);
-        when(activeRule.getRuleKey()).thenReturn("some-rule");
+        when(activeRule.getRuleKey()).thenReturn("align");
         activeRules.add(activeRule);
         this.rulesProfile = mock(RulesProfile.class);
         when(rulesProfile.getActiveRulesByRepository(anyString())).thenReturn(activeRules);
@@ -114,7 +114,7 @@ public class TsLintSensorTest {
     public void analyse_addsIssues() {
 
         when(executor.execute(any(String.class), any(String.class), any(String.class))).thenReturn(
-            "[{startPosition: {line: 1}, failure: \"failure\", ruleName:\"some-rule\"}]");
+            "[{startPosition: {line: 1}, failure: \"failure\", ruleName:\"align\"}]");
 
         final List<Issue> capturedIssues = new ArrayList<Issue>();
         Answer<Void> captureIssue = new Answer<Void>() {
