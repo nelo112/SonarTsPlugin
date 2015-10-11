@@ -3,6 +3,7 @@ package com.pablissimo.sonar;
 import java.util.Arrays;
 import java.util.List;
 
+import com.pablissimo.sonar.rules.TsRulesDefinition;
 import org.sonar.api.Properties;
 import org.sonar.api.Property;
 import org.sonar.api.PropertyType;

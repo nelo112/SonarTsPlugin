@@ -2,6 +2,7 @@ package com.pablissimo.sonar;
 
 import com.google.common.io.Files;
 import com.pablissimo.sonar.model.TsLintIssue;
+import com.pablissimo.sonar.rules.TsRulesDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.Sensor;
