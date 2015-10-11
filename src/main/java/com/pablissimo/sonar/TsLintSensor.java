@@ -1,36 +1,30 @@
 package com.pablissimo.sonar;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.google.common.io.Files;
+import com.pablissimo.sonar.model.TsLintIssue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.Sensor;
 import org.sonar.api.batch.SensorContext;
+import org.sonar.api.batch.fs.FilePredicates;
+import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.component.ResourcePerspectives;
 import org.sonar.api.config.Settings;
 import org.sonar.api.issue.Issuable;
+import org.sonar.api.issue.Issue;
 import org.sonar.api.profiles.RulesProfile;
 import org.sonar.api.resources.Project;
 import org.sonar.api.resources.Resource;
 import org.sonar.api.rule.RuleKey;
 import org.sonar.api.rules.ActiveRule;
-import org.sonar.api.rules.ActiveRuleParam;
-import org.sonar.api.batch.fs.FilePredicates;
-import org.sonar.api.batch.fs.FileSystem;
 
-import com.google.common.base.Charsets;
-import com.google.common.base.Throwables;
-import com.google.common.io.Files;
-import com.google.gson.GsonBuilder;
-import com.pablissimo.sonar.model.TsLintConfig;
-import com.pablissimo.sonar.model.TsLintIssue;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.HashSet;
+import java.util.Set;
 
 public class TsLintSensor implements Sensor {
-    public static final String CONFIG_FILENAME = "tslint.json";
 
     private static final Logger LOG = LoggerFactory.getLogger(TsLintExecutorImpl.class);
 
@@ -38,14 +32,17 @@ public class TsLintSensor implements Sensor {
     private FileSystem fileSystem;
     private FilePredicates filePredicates;
     private ResourcePerspectives perspectives;
-    private RulesProfile rulesProfile;
+    private Set<String> activeRuleKeys = new HashSet<>();
 
     public TsLintSensor(Settings settings, FileSystem fileSystem, ResourcePerspectives perspectives, RulesProfile rulesProfile) {
         this.settings = settings;
         this.fileSystem = fileSystem;
         this.filePredicates = fileSystem.predicates();
         this.perspectives = perspectives;
-        this.rulesProfile = rulesProfile;
+
+        for (ActiveRule rule : rulesProfile.getActiveRulesByRepository(TsRulesDefinition.REPOSITORY_NAME)) {
+            this.activeRuleKeys.add(rule.getRuleKey());
+        }
     }
 
     public boolean shouldExecuteOnProject(Project project) {
@@ -65,20 +62,14 @@ public class TsLintSensor implements Sensor {
             LOG.warn("Path to tslint (" + TypeScriptPlugin.SETTING_TS_LINT_PATH + ") is not defined. Skipping tslint analysis.");
             return;
         }
+        String pathToTsLintConfig = settings.getString(TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH);
+        if (pathToTsLintConfig == null) {
+            LOG.warn("Path to tslint config(" + TypeScriptPlugin.SETTING_TS_LINT_PATH + ") is not defined. Skipping tslint analysis.");
+            return;
+        }
 
         TsLintExecutor executor = this.getTsLintExecutor();
         TsLintParser parser = this.getTsLintParser();
-
-        // Build the config file
-        File configFile = new File(this.fileSystem.workDir(), CONFIG_FILENAME);
-        TsLintConfig config = getConfiguration();
-        String configSerialised = new GsonBuilder().setPrettyPrinting().create().toJson(config);
-
-        try {
-            writeConfiguration(configSerialised, configFile, Charsets.UTF_8);
-        } catch (IOException e) {
-            throw Throwables.propagate(e);
-        }
 
         boolean skipTypeDefFiles = settings.getBoolean(TypeScriptPlugin.SETTING_EXCLUDE_TYPE_DEFINITION_FILES);
 
@@ -90,21 +81,25 @@ public class TsLintSensor implements Sensor {
             Resource resource = this.getFileFromIOFile(file, project);
             Issuable issuable = perspectives.as(Issuable.class, resource);
 
-            String jsonResult = executor.execute(pathToTsLint, configFile.getPath(), file.getAbsolutePath());
+            String jsonResult = executor.execute(pathToTsLint, pathToTsLintConfig, file.getAbsolutePath());
 
             TsLintIssue[] issues = parser.parse(jsonResult);
 
             if (issues != null) {
                 for (TsLintIssue issue : issues) {
-                    issuable.addIssue
-                    (
-                        issuable
-                            .newIssueBuilder()
-                            .line(issue.getStartPosition().getLine() + 1)
-                            .message(issue.getFailure())
-                            .ruleKey(RuleKey.of(TsRulesDefinition.REPOSITORY_NAME, issue.getRuleName()))
-                            .build()
-                    );
+                    String tslintRuleName = issue.getRuleName();
+                    if (!activeRuleKeys.contains(tslintRuleName)) {
+                        continue;
+                    }
+
+                    Issue convertedIssue = issuable
+                        .newIssueBuilder()
+                        .line(issue.getStartPosition().getLine() + 1)
+                        .message(issue.getFailure())
+                        .ruleKey(RuleKey.of(TsRulesDefinition.REPOSITORY_NAME, issue.getRuleName()))
+                        .build();
+
+                    issuable.addIssue(convertedIssue);
                 }
             }
         }
@@ -126,40 +121,4 @@ public class TsLintSensor implements Sensor {
         return new TsLintParserImpl();
     }
 
-    protected TsLintConfig getConfiguration() {
-        TsLintConfig toReturn = new TsLintConfig();
-
-        for (ActiveRule rule : this.rulesProfile.getActiveRulesByRepository(TsRulesDefinition.REPOSITORY_NAME)) {
-            List<ActiveRuleParam> params = rule.getActiveRuleParams();
-
-            if (params == null || params.size() == 0) {
-                // Simple binary rule
-                toReturn.addRule(rule.getRuleKey(), rule.isEnabled());
-            }
-            else {
-                List<Object> processedParams = new ArrayList<Object>(params.size());
-                processedParams.add(true);
-
-                for (ActiveRuleParam param : params) {
-                    switch (param.getRuleParam().getType()) {
-                        case "BOOLEAN":
-                            if (param.getValue() == "true") {
-                                processedParams.add(param.getParamKey());
-                            }
-                            break;
-                        case "INTEGER":
-                            processedParams.add(Integer.parseInt(param.getValue()));
-                            break;
-                        default:
-                            processedParams.add(param.getValue());
-                            break;
-                    }
-                }
-
-                toReturn.addRule(rule.getRuleKey(), processedParams.toArray());
-            }
-        }
-
-        return toReturn;
-    }
 }

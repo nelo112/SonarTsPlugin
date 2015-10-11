@@ -9,17 +9,16 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.io.Charsets;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.api.batch.fs.FilePredicate;
 import org.sonar.api.batch.fs.FilePredicates;
 import org.sonar.api.batch.fs.FileSystem;
+import org.sonar.api.batch.rule.internal.ActiveRulesBuilder;
 import org.sonar.api.component.ResourcePerspectives;
 import org.sonar.api.config.Settings;
 import org.sonar.api.issue.Issuable;
@@ -32,6 +31,7 @@ import com.pablissimo.sonar.model.TsLintIssue;
 import com.pablissimo.sonar.model.TsLintPosition;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
+import org.sonar.api.rules.ActiveRule;
 
 public class TsLintSensorTest {
     Settings settings;
@@ -48,13 +48,13 @@ public class TsLintSensorTest {
     org.sonar.api.resources.File sonarFile;
 
     TsLintExecutor executor;
-    TsLintParser parser;
     TsLintSensor sensor;
 
     @Before
     public void setUp() throws Exception {
         this.settings = mock(Settings.class);
         when(this.settings.getString(TypeScriptPlugin.SETTING_TS_LINT_PATH)).thenReturn("/path/to/tslint");
+        when(this.settings.getString(TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH)).thenReturn("/path/to/tslint.json");
 
         this.fileSystem = mock(FileSystem.class);
         this.perspectives = mock(ResourcePerspectives.class);
@@ -62,7 +62,14 @@ public class TsLintSensorTest {
         this.issueBuilder = mock(IssueBuilder.class, RETURNS_DEEP_STUBS);
         when(this.issuable.newIssueBuilder()).thenReturn(this.issueBuilder);
         doReturn(this.issuable).when(this.perspectives).as(eq(Issuable.class), any(org.sonar.api.resources.File.class));
+
+
+        List<ActiveRule> activeRules = new ArrayList<>();
+        ActiveRule activeRule = mock(ActiveRule.class);
+        when(activeRule.getRuleKey()).thenReturn("some-rule");
+        activeRules.add(activeRule);
         this.rulesProfile = mock(RulesProfile.class);
+        when(rulesProfile.getActiveRulesByRepository(anyString())).thenReturn(activeRules);
 
         this.file = mock(File.class);
         doReturn(true).when(this.file).isFile();
@@ -82,12 +89,10 @@ public class TsLintSensorTest {
         this.sonarFile = mock(org.sonar.api.resources.File.class);
 
         this.executor = mock(TsLintExecutor.class);
-        this.parser = mock(TsLintParser.class);
         this.sensor = spy(new TsLintSensor(settings, fileSystem, perspectives, rulesProfile));
         doNothing().when(this.sensor).writeConfiguration(any(String.class), any(File.class), any(Charset.class));
         doReturn(this.sonarFile).when(this.sensor).getFileFromIOFile(eq(this.file), any(Project.class));
         doReturn(this.executor).when(this.sensor).getTsLintExecutor();
-        doReturn(this.parser).when(this.sensor).getTsLintParser();
     }
 
     @After
@@ -106,30 +111,10 @@ public class TsLintSensorTest {
     }
 
     @Test
-    public void analyse_WritesConfigurationFile() throws IOException {
-        when(this.fileSystem.files(any(FilePredicate.class))).thenReturn(new ArrayList<File>());
-        this.sensor.analyse(mock(Project.class), mock(SensorContext.class));
-
-        ArgumentCaptor<File> fileCaptor = ArgumentCaptor.forClass(File.class);
-        verify(this.sensor).writeConfiguration(eq("{\n  \"rules\": {}\n}"), fileCaptor.capture(), eq(Charsets.UTF_8));
-
-        assertEquals("tslint.json", fileCaptor.getValue().getName());
-    }
-
-    @Test
     public void analyse_addsIssues() {
-        TsLintIssue issue = new TsLintIssue();
-        issue.setFailure("failure");
-        issue.setRuleName("rule name");
 
-        TsLintPosition startPosition = new TsLintPosition();
-        startPosition.setLine(1);
-
-        issue.setStartPosition(startPosition);
-
-        TsLintIssue[] issues = new TsLintIssue[] {
-            issue
-        };
+        when(executor.execute(any(String.class), any(String.class), any(String.class))).thenReturn(
+            "[{startPosition: {line: 1}, failure: \"failure\", ruleName:\"some-rule\"}]");
 
         final List<Issue> capturedIssues = new ArrayList<Issue>();
         Answer<Void> captureIssue = new Answer<Void>() {
@@ -141,7 +126,6 @@ public class TsLintSensorTest {
         };
 
         when(this.issuable.addIssue(any(Issue.class))).then(captureIssue);
-        when(parser.parse(any(String.class))).thenReturn(issues);
         this.sensor.analyse(mock(Project.class), mock(SensorContext.class));
 
         assertEquals(1, capturedIssues.size());
